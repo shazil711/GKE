@@ -21,7 +21,7 @@ steps:
 substitutions:
   _PROJECT_ID : storied-core-424404-t8
   _CINAME : gke-image
-  _VERSION : v3.0
+  _VERSION : v1.0
 
 
 
