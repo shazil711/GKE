@@ -1,42 +1,50 @@
-#https://source.developers.google.com/p/gcp-devops-338510/r/repo-5
-
 steps:
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build','-t',  'gcr.io/${_PROJECT_ID}/${_CINAME}:${_VERSION}', '.']
+  # Step 1: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/${_PROJECT_ID}/${_CINAME}:${_VERSION}', '.']
 
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['push','gcr.io/${_PROJECT_ID}/${_CINAME}:${_VERSION}']
+  # Step 2: Push the image to Artifact Registry (gcr.io)
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/${_PROJECT_ID}/${_CINAME}:${_VERSION}']
 
-#Add deployment
+  # Step 3: Create the prod-space namespace (idempotent - won't fail if it exists)
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+      - 'create'
+      - 'namespace'
+      - 'prod-space'
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-east1-b'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cicd-cluster'
+    allowFailure: true
 
-- name: 'gcr.io/cloud-builders/kubectl'
-  args:
-  - 'apply'
-  - '-f'
-  - 'k8s/cloudbuild-gke.yaml'  # Path to your deployment manifest
-  - '--namespace=prod-space'
-  env:
-  - 'CLOUDSDK_COMPUTE_ZONE=us-east1-b'
-  - 'CLOUDSDK_CONTAINER_CLUSTER=cicd-cluster'
-  
+  # Step 4: Apply the Kubernetes deployment manifest
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+      - 'apply'
+      - '-f'
+      - 'k8s/cloudbuild-gke.yaml'
+      - '--namespace=prod-space'
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-east1-b'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cicd-cluster'
 
-# kubectl set image deployment/cicd-app-1 runimage-sha256-1=gcr.io/${_PROJECT_ID}/${_CINAME}:${_VERSION}
-- name: 'gcr.io/cloud-builders/kubectl'
-  args :
-  - 'set'
-  - 'image'
-  - 'deployment/cicd-app-1'
-  - 'runimage-sha256-1=gcr.io/${_PROJECT_ID}/${_CINAME}:${_VERSION}'
-  env : 
-  - 'CLOUDSDK_COMPUTE_ZONE=us-east1-b'
-  - 'CLOUDSDK_CONTAINER_CLUSTER=cicd-cluster'
+  # Step 5: Update the deployment with the new image version
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+      - 'set'
+      - 'image'
+      - 'deployment/cicd-app-1'
+      - 'runimage-sha256-1=gcr.io/${_PROJECT_ID}/${_CINAME}:${_VERSION}'
+      - '--namespace=prod-space'
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-east1-b'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cicd-cluster'
 
 substitutions:
-  _PROJECT_ID : nopedope-508108
-  _CINAME : gke-image
-  _VERSION : v3.0
-
-
+  _PROJECT_ID: nopedope-508108
+  _CINAME: gke-image
+  _VERSION: v3.0
 
 options:
-  logging : CLOUD_LOGGING_ONLY
+  logging: CLOUD_LOGGING_ONLY
