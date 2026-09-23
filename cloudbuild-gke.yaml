@@ -13,7 +13,7 @@ steps:
   args:
   - 'apply'
   - '-f'
-  - 'k8s/deployment.yaml'  # Path to your deployment manifest
+  - 'k8s/cloudbuild-gke.yaml'  # Path to your deployment manifest
   - '--namespace=prod-space'
   env:
   - 'CLOUDSDK_COMPUTE_ZONE=us-east1-b'
