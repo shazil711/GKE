@@ -23,7 +23,7 @@ steps:
     args:
       - 'apply'
       - '-f'
-      - 'k8s/cloudbuild-gke.yaml'
+      - '/cloudbuild-gke.yaml'
       - '--namespace=prod-space'
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=us-east1-b'
