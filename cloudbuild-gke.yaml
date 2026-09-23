@@ -7,6 +7,19 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push','gcr.io/${_PROJECT_ID}/${_CINAME}:${_VERSION}']
 
+#Add deployment
+
+- name: 'gcr.io/cloud-builders/kubectl'
+  args:
+  - 'apply'
+  - '-f'
+  - 'k8s/deployment.yaml'  # Path to your deployment manifest
+  - '--namespace=prod-space'
+  env:
+  - 'CLOUDSDK_COMPUTE_REGION=us-east1'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=cicd-cluster'
+  
+
 # kubectl set image deployment/cicd-app-1 runimage-sha256-1=gcr.io/${_PROJECT_ID}/${_CINAME}:${_VERSION}
 - name: 'gcr.io/cloud-builders/kubectl'
   args :
