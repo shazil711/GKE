@@ -25,7 +25,7 @@ steps:
 substitutions:
   _PROJECT_ID: nopedope-508108
   _CINAME: gke-image
-  _VERSION: v3.0
+  _VERSION: $SHORT_SHA
 
 options:
   logging: CLOUD_LOGGING_ONLY
