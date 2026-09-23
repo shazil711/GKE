@@ -1,35 +1,16 @@
 steps:
-  # Step 1: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/${_PROJECT_ID}/${_CINAME}:${_VERSION}', '.']
 
-  # Step 2: Push the image to Artifact Registry (gcr.io)
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/${_PROJECT_ID}/${_CINAME}:${_VERSION}']
 
-  # Step 3: Create the prod-space namespace (idempotent - won't fail if it exists)
   - name: 'gcr.io/cloud-builders/kubectl'
-    args:
-      - 'create'
-      - 'namespace'
-      - 'prod-space'
-    env:
-      - 'CLOUDSDK_COMPUTE_ZONE=us-east1-b'
-      - 'CLOUDSDK_CONTAINER_CLUSTER=cicd-cluster'
-    allowFailure: true
-
-  # Step 4: Apply the Kubernetes deployment manifest
-  - name: 'gcr.io/cloud-builders/kubectl'
-    args:
-      - 'apply'
-      - '-f'
-      - '/cloudbuild-gke.yaml'
-      - '--namespace=prod-space'
+    args: ['apply', '-f', 'cloudbuild-gke.yaml', '--namespace=prod-space']
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=us-east1-b'
       - 'CLOUDSDK_CONTAINER_CLUSTER=cicd-cluster'
 
-  # Step 5: Update the deployment with the new image version
   - name: 'gcr.io/cloud-builders/kubectl'
     args:
       - 'set'
