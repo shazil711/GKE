@@ -15,11 +15,11 @@ steps:
   - 'deployment/cicd-app-1'
   - 'runimage-sha256-1=gcr.io/${_PROJECT_ID}/${_CINAME}:${_VERSION}'
   env : 
-  - 'CLOUDSDK_COMPUTE_ZONE=us-central1-a'
+  - 'CLOUDSDK_COMPUTE_ZONE=us-east1-b'
   - 'CLOUDSDK_CONTAINER_CLUSTER=cicd-cluster'
 
 substitutions:
-  _PROJECT_ID : storied-core-424404-t8
+  _PROJECT_ID : nopedope-508108
   _CINAME : gke-image
   _VERSION : v3.0
 
