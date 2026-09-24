@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cicd-app-1
-  namespace: prod-space
   labels:
     app: cicd-app-1
 spec:
